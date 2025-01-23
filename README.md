@@ -1,5 +1,25 @@
 # DIII 2025 -- Networking
 
+This is the documentation for the API used to communicate between the vehicles and the cranes.
+
+## Install
+
+### Native
+
+1. Make sure to have python 3.12 (Might work on other versions)
+
+```sh
+pip install -r requirements.txt
+python app.py
+```
+
+### With docker
+
+```sh
+docker build . --target dev -t design3-api
+docker run design3-api -p 5000:5000
+```
+
 ## API
 
 ### GET `/`
