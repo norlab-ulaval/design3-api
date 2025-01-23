@@ -36,7 +36,7 @@ Validate that the API is running.
 
 ### GET `/cranes`
 
-Get the number of tokens on each scale.
+Get the number of tokens on each scale. The id corresponds to the team id (AKA ZC\<id\>)
 
 - Response:
   - **200** OK
@@ -49,14 +49,6 @@ Get the number of tokens on each scale.
         },
         {
           "id": 2,
-          "nb_tokens": 0
-        },
-        {
-          "id": 3,
-          "nb_tokens": 0
-        },
-        {
-          "id": 4,
           "nb_tokens": 0
         }
       ]
@@ -104,7 +96,7 @@ Update the number of merchandise on a scale.
 
 ### GET `/vehicles`
 
-Get the objective of every vehicles.
+Get the objective of every vehicles. The id corresponds to the team id (AKA ZD\<id\>)
 
 - Response:
   - **200** OK
@@ -118,14 +110,6 @@ Get the objective of every vehicles.
         {
           "going_to": 0,
           "id": 2
-        },
-        {
-          "going_to": 0,
-          "id": 3
-        },
-        {
-          "going_to": 0,
-          "id": 4
         }
       ]
     }
