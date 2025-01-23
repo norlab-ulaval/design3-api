@@ -17,7 +17,7 @@ python app.py
 
 ```sh
 docker build . --target dev -t design3-api
-docker run design3-api -p 5000:5000
+docker run -p 5000:5000 design3-api
 ```
 
 ## API
