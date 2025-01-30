@@ -1,4 +1,4 @@
-FROM python:3.12-alpine as dev
+FROM python:3.12-alpine AS dev
 
 EXPOSE 5000
 
@@ -13,6 +13,6 @@ ENTRYPOINT ["python3"]
 CMD ["app.py"]
 
 
-FROM dev as prod
+FROM dev AS prod
 
-ENTRYPOINT ["waitress-serve", "--listen", "0.0.0.0:5000", "--call", "app:create_app"]
+ENTRYPOINT ["waitress-serve", "--listen", "0.0.0.0:80", "--call", "app:create_app"]

@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
+from constants import NB_CRANES
 from models import Crane
 
 cranes_bp = Blueprint('cranes', __name__, url_prefix='/cranes')
 
-NB_CRANES = 4
 cranes: list[Crane] = [Crane(x+1, 0) for x in range(NB_CRANES)]
 
 @cranes_bp.route("/")

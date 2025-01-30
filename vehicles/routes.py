@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
+from constants import NB_VEHICLES
 from models import Vehicle
 
 vehicles_bp = Blueprint('vehicles', __name__, url_prefix='/vehicles')
 
-NB_VEHICLES = 4
 vehicles: list[Vehicle] = [Vehicle(x+1, 0) for x in range(NB_VEHICLES)]
 
 @vehicles_bp.route("/")

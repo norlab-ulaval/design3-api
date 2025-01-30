@@ -1,0 +1,2 @@
+NB_CRANES = 6
+NB_VEHICLES = 7

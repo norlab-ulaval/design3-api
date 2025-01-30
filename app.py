@@ -18,4 +18,4 @@ if __name__ == '__main__':
     app = create_app()
 
     app.logger.warning("Starting the app in development mode.")
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
