@@ -15,4 +15,4 @@ CMD ["app.py"]
 
 FROM dev AS prod
 
-ENTRYPOINT ["waitress-serve", "--listen", "0.0.0.0:80", "--call", "app:create_app"]
+ENTRYPOINT ["waitress-serve", "--listen", "0.0.0.0:5000", "--call", "app:create_app"]
