@@ -4,7 +4,7 @@ from models import Vehicle
 
 vehicles_bp = Blueprint('vehicles', __name__, url_prefix='/vehicles')
 
-vehicles: list[Vehicle] = [Vehicle(x+1, 0) for x in range(NB_VEHICLES)]
+vehicles: list[Vehicle] = [Vehicle(x+1, "") for x in range(NB_VEHICLES)]
 
 @vehicles_bp.route("/")
 def get_vehicles():
@@ -35,13 +35,19 @@ def set_vehicle(vehicle_id: int):
 
     content = request.get_json()
 
-    going_to = 0
+    going_to = ""
     try:
-        going_to = int(content['going_to'])
-        if going_to < 0:
-            raise Exception()
+        going_to = str(content['going_to']).upper()
     except:
-        return jsonify({"error": "going_to is invalid"}), 400
+        return jsonify({"error": "going_to must be a string"}), 400
+
+    if len(going_to) <= 2:
+        return jsonify({"error": "going_to must be longer than 2 characters (ZCxx or ZDxx)"}), 400
+
+    if not going_to.startswith("ZD") and not going_to.startswith("ZC"):
+        return jsonify({"error": "going_to must start with ZD or ZC"}), 400
+    
+    # TODO: Validate number after ZD or ZC
 
     vehicle = vehicles[vehicle_id-1]
     vehicle.going_to = going_to

@@ -9,4 +9,4 @@ class Crane:
 @dataclass
 class Vehicle:
     id: int
-    going_to: int
+    going_to: str

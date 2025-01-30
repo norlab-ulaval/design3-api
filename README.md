@@ -1,31 +1,40 @@
-# DIII 2025 -- Networking
+# API Design 3 - Ville Portuaire Intelligente 
 
-This is the documentation for the API used to communicate between the vehicles and the cranes.
+Voici l'implémentation de l'API de design 3 pour la ville portuaire intelligente. Il s'agit d'une API en Python sous Flask qui permet aux sous-systèmes grues et véhicules de communiquer ensemble.
 
-## Install
+## Installation
 
-### Native
+### Natif
 
-1. Make sure to have python 3.12 (Might work on other versions)
-
+1. S'assurer d'avoir python 3.12 (Peut-être fonctionnel avec d'autres versions, mais pas testé)
 ```sh
 pip install -r requirements.txt
 python app.py
 ```
+2. Le serveur devrait être démarré en mode développement sur [http://localhost:5000](http://localhost:5000)
 
-### With docker
+### Avec Docker
 
+1. S'assurer d'avoir Docker 
 ```sh
 docker build . --target dev -t design3-api
 docker run -p 5000:5000 design3-api
 ```
+2. Le serveur devrait être démarré en mode développement sur [http://localhost:5000](http://localhost:5000)
 
-## API
+## Déploiement
+
+1. Le serveur est déployé et accessible sur le campus de l'université à l'adresse suivante: [http://172.105.22.140/](http://172.105.22.140/). Voici les commandes utilisés pour le déployer en mode production:
+```
+./build.bash
+./launch.bash
+```
+
+## Routes de l'API
 
 ### GET `/`
 
-Validate that the API is running.
-
+Page pour valider que l'API est bien démarrée
 - Response:
   - **200** OK
     ```json
@@ -36,7 +45,7 @@ Validate that the API is running.
 
 ### GET `/cranes`
 
-Get the number of tokens on each scale. The id corresponds to the team id (AKA ZC\<id\>)
+Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond au numéro d'une équipe et correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
 
 - Response:
   - **200** OK
@@ -57,7 +66,7 @@ Get the number of tokens on each scale. The id corresponds to the team id (AKA Z
 
 ### GET `/cranes/:id`
 
-Get the number of tokens on a scale.
+Route pour obtenir l'information sur une équipe du sous-système grue spécifique.
 
 - Response:
 
@@ -79,7 +88,7 @@ Get the number of tokens on a scale.
 
 ### POST `/cranes/:id`
 
-Update the number of merchandise on a scale.
+Route utilisé pour mettre à jour le nombre de marchandise sur la balance pour les équipes du sous-système grue.
 
 - Body:
 
@@ -96,7 +105,7 @@ Update the number of merchandise on a scale.
 
 ### GET `/vehicles`
 
-Get the objective of every vehicles. The id corresponds to the team id (AKA ZD\<id\>)
+Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le champ `id` correspond au numéro d'une équipe et correspond à l'id de la zone de dépôt (i.e. ZD\<id\>). Le champ `going_to` correspond à la destination actuelle du véhicule.
 
 - Response:
   - **200** OK
@@ -117,7 +126,7 @@ Get the objective of every vehicles. The id corresponds to the team id (AKA ZD\<
 
 ### GET `/vehicles/:id`
 
-Get the objective of a vehicle.
+Route pour obtenir l'information sur une équipe du sous-système véhicule spécifique.
 
 - Response:
 
@@ -139,13 +148,13 @@ Get the objective of a vehicle.
 
 ### POST `/vehicles/:id`
 
-Update the objective of a vehicle.
+Route utilisé pour mettre à jour la destination actuelle pour les équipes du sous-système véhicule. La destination actuelle doit être une zone de dépôt où une zone de chargement (ZC\<id\> ou ZD\<id\>) 
 
 - Body:
 
   ```json
   {
-    "going_to": 2
+    "going_to": "ZC2"
   }
   ```
 
