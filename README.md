@@ -114,11 +114,11 @@ Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le cham
       "vehicles": [
         {
           "going_to": 0,
-          "id": 1
+          "id": 7
         },
         {
           "going_to": 0,
-          "id": 2
+          "id": 8
         }
       ]
     }
@@ -135,7 +135,7 @@ Route pour obtenir l'information sur une équipe du sous-système véhicule spé
     ```json
     {
       "going_to": 0,
-      "id": 3
+      "id": 7
     }
     ```
 
