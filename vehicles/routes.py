@@ -1,16 +1,17 @@
 from flask import Blueprint, request, jsonify
-from constants import NB_VEHICLES
+from constants import NB_VEHICLES, VEHICULE_ID_OFFSET
 from models import Vehicle
 
-vehicles_bp = Blueprint('vehicles', __name__, url_prefix='/vehicles')
+vehicles_bp = Blueprint("vehicles", __name__, url_prefix="/vehicles")
 
-vehicles: list[Vehicle] = [Vehicle(x+1, "") for x in range(NB_VEHICLES)]
+vehicles: list[Vehicle] = [
+    Vehicle(x + VEHICULE_ID_OFFSET, "") for x in range(NB_VEHICLES)
+]
+
 
 @vehicles_bp.route("/")
 def get_vehicles():
-    response = {
-        "vehicles": [vehicle for vehicle in vehicles]
-    }
+    response = {"vehicles": [vehicle for vehicle in vehicles]}
 
     return jsonify(response)
 
@@ -20,7 +21,7 @@ def get_vehicle(vehicle_id: int):
     if is_vehicle_id_invalid(vehicle_id):
         return jsonify({"error": "vehicle_id is invalid"}), 400
 
-    vehicle = vehicles[vehicle_id-1]
+    vehicle = vehicles[vehicle_id - VEHICULE_ID_OFFSET]
 
     return jsonify(vehicle)
 
@@ -37,23 +38,30 @@ def set_vehicle(vehicle_id: int):
 
     going_to = ""
     try:
-        going_to = str(content['going_to']).upper()
+        going_to = str(content["going_to"]).upper()
     except:
         return jsonify({"error": "going_to must be a string"}), 400
 
     if len(going_to) <= 2:
-        return jsonify({"error": "going_to must be longer than 2 characters (ZCxx or ZDxx)"}), 400
+        return (
+            jsonify(
+                {"error": "going_to must be longer than 2 characters (ZCxx or ZDxx)"}
+            ),
+            400,
+        )
 
     if not going_to.startswith("ZD") and not going_to.startswith("ZC"):
         return jsonify({"error": "going_to must start with ZD or ZC"}), 400
-    
+
     # TODO: Validate number after ZD or ZC
 
-    vehicle = vehicles[vehicle_id-1]
+    vehicle = vehicles[vehicle_id - VEHICULE_ID_OFFSET]
     vehicle.going_to = going_to
 
     return jsonify(vehicle)
 
 
 def is_vehicle_id_invalid(team_id: int):
-    return team_id <= 0 or team_id > NB_VEHICLES
+    return (
+        team_id < VEHICULE_ID_OFFSET or team_id > NB_VEHICLES + VEHICULE_ID_OFFSET - 1
+    )
