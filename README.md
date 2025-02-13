@@ -26,7 +26,7 @@ docker run -p 5000:5000 design3-api
 
 2. Le serveur devrait être démarré en mode développement sur [http://localhost:5000](http://localhost:5000)
 
-## Examples
+## Exemples
 
 Pour votre utilisation de l'API, vous pouvez vous inspirer des scripts dans le répertoire [./examples](./examples/). Il y a un script d'exemple pour chaque sous-système.
 
