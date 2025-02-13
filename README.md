@@ -158,7 +158,7 @@ Route pour obtenir l'information sur une équipe du sous-système véhicule spé
 
 ### POST `/vehicles/:id`
 
-Route utilisé pour mettre à jour le chemin planifié par les équipes du sous-système véhicule.
+Route utilisé pour mettre à jour le chemin planifié par les équipes du sous-système véhicule. Le chemin doit commencer par le dernier panneau détecté et se terminer par une zone de chargement `ZC<id>` ou une zone de dépôt `ZD<id>`.
 
 - Body:
 
