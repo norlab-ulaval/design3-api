@@ -4,9 +4,7 @@ from models import Vehicle
 
 vehicles_bp = Blueprint("vehicles", __name__, url_prefix="/vehicles")
 
-vehicles: list[Vehicle] = [
-    Vehicle(x + VEHICULE_ID_OFFSET, "") for x in range(NB_VEHICLES)
-]
+vehicles: list[Vehicle] = [Vehicle(x + VEHICULE_ID_OFFSET, []) for x in range(NB_VEHICLES)]
 
 
 @vehicles_bp.route("/")
@@ -36,32 +34,21 @@ def set_vehicle(vehicle_id: int):
 
     content = request.get_json()
 
-    going_to = ""
     try:
-        going_to = str(content["going_to"]).upper()
+        path = content["path"]
+        # Check if path is a list of string
+        if not isinstance(path, list) or not all(isinstance(x, str) for x in path):
+            raise ValueError
+
+        path = [str(x) for x in content["path"]]
     except:
-        return jsonify({"error": "going_to must be a string"}), 400
-
-    if len(going_to) <= 2:
-        return (
-            jsonify(
-                {"error": "going_to must be longer than 2 characters (ZCxx or ZDxx)"}
-            ),
-            400,
-        )
-
-    if not going_to.startswith("ZD") and not going_to.startswith("ZC"):
-        return jsonify({"error": "going_to must start with ZD or ZC"}), 400
-
-    # TODO: Validate number after ZD or ZC
+        return jsonify({"error": "path must be a list of string"}), 400
 
     vehicle = vehicles[vehicle_id - VEHICULE_ID_OFFSET]
-    vehicle.going_to = going_to
+    vehicle.path = path
 
     return jsonify(vehicle)
 
 
 def is_vehicle_id_invalid(team_id: int):
-    return (
-        team_id < VEHICULE_ID_OFFSET or team_id > NB_VEHICLES + VEHICULE_ID_OFFSET - 1
-    )
+    return team_id < VEHICULE_ID_OFFSET or team_id > NB_VEHICLES + VEHICULE_ID_OFFSET - 1

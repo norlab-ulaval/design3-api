@@ -1,4 +1,4 @@
-# API Design 3 - Ville Portuaire Intelligente 
+# API Design 3 - Ville Portuaire Intelligente
 
 Voici l'implémentation de l'API de design 3 pour la ville portuaire intelligente. Il s'agit d'une API en Python sous Flask qui permet aux sous-systèmes grues et véhicules de communiquer ensemble.
 
@@ -7,24 +7,29 @@ Voici l'implémentation de l'API de design 3 pour la ville portuaire intelligent
 ### Natif
 
 1. S'assurer d'avoir python 3.12 (Peut-être fonctionnel avec d'autres versions, mais pas testé)
+
 ```sh
 pip install -r requirements.txt
 python app.py
 ```
+
 2. Le serveur devrait être démarré en mode développement sur [http://localhost:5000](http://localhost:5000)
 
 ### Avec Docker
 
-1. S'assurer d'avoir Docker 
+1. S'assurer d'avoir Docker
+
 ```sh
 docker build . --target dev -t design3-api
 docker run -p 5000:5000 design3-api
 ```
+
 2. Le serveur devrait être démarré en mode développement sur [http://localhost:5000](http://localhost:5000)
 
 ## Déploiement
 
-1. Le serveur est déployé et accessible sur le campus de l'université à l'adresse suivante: [http://172.105.22.140/](http://172.105.22.140/). Voici les commandes utilisés pour le déployer en mode production:
+1. Le serveur est déployé et accessible à l'adresse suivante: [http://172.105.22.140/](http://172.105.22.140/). Voici les commandes utilisés pour le déployer en mode production:
+
 ```
 ./build.bash
 ./launch.bash
@@ -35,6 +40,7 @@ docker run -p 5000:5000 design3-api
 ### GET `/`
 
 Page pour valider que l'API est bien démarrée
+
 - Response:
   - **200** OK
     ```json
@@ -105,7 +111,7 @@ Route utilisé pour mettre à jour le nombre de marchandise sur la balance pour 
 
 ### GET `/vehicles`
 
-Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le champ `id` correspond au numéro d'une équipe et correspond à l'id de la zone de dépôt (i.e. ZD\<id\>). Le champ `going_to` correspond à la destination actuelle du véhicule.
+Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le champ `id` correspond au numéro d'une équipe et correspond à l'id de la zone de dépôt (i.e. ZD\<id\>). Le champ `path` correspond au chemin actuel suivi par le véhicule.
 
 - Response:
   - **200** OK
@@ -113,11 +119,11 @@ Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le cham
     {
       "vehicles": [
         {
-          "going_to": "ZC1",
+          "path": ["ZD7", "A1", "ZC1"],
           "id": 7
         },
         {
-          "going_to": "ZC2",
+          "path": ["ZD8", "A2", "ZC2"],
           "id": 8
         }
       ]
@@ -134,7 +140,7 @@ Route pour obtenir l'information sur une équipe du sous-système véhicule spé
 
     ```json
     {
-      "going_to": "ZC1",
+      "path": ["ZD7", "A1", "ZC1"],
       "id": 7
     }
     ```
@@ -148,17 +154,17 @@ Route pour obtenir l'information sur une équipe du sous-système véhicule spé
 
 ### POST `/vehicles/:id`
 
-Route utilisé pour mettre à jour la destination actuelle pour les équipes du sous-système véhicule. La destination actuelle doit être une zone de dépôt où une zone de chargement (ZC\<id\> ou ZD\<id\>) 
+Route utilisé pour mettre à jour le chemin planifié par les équipes du sous-système véhicule.
 
 - Body:
 
   ```json
   {
-    "going_to": "ZC2"
+    "path": ["ZD7", "A1", "ZC1"]
   }
   ```
 
 - Response:
   - **200** OK
   - **400** BAD_REQUEST\
-     String: (invalid vehicle_id, invalid JSON, invalid going_to)
+     String: (invalid vehicle_id, invalid JSON, invalid path)
