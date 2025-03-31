@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from storage import Storage
 from vehicles import vehicles_bp
 from cranes import cranes_bp
 from scores import scores_bp
@@ -15,7 +16,18 @@ def create_app():
 
     @app.route("/")
     def root():
-        return jsonify({"message": "Welcome to the design 3 API."})
+        if request.headers.get("Accept") == "application/json":
+            return jsonify({"message": "Welcome to the design 3 API."})
+
+        return "Welcome to the design 3 API."
+
+    @app.route("/reset")
+    def reset():
+        Storage().reset()
+        if request.headers.get("Accept") == "application/json":
+            return jsonify({"message": "API reset was successful."})
+
+        return "API reset was successful."
 
     return app
 

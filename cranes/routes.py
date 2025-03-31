@@ -1,15 +1,13 @@
 from flask import Blueprint, request, jsonify
 from constants import NB_CRANES
-from models import Crane
+from storage import Storage
 
 cranes_bp = Blueprint("cranes", __name__, url_prefix="/cranes")
-
-cranes: list[Crane] = [Crane(x + 1, 0) for x in range(NB_CRANES)]
 
 
 @cranes_bp.route("/")
 def get_cranes():
-    response = {"cranes": [crane for crane in cranes]}
+    response = {"cranes": [crane for crane in Storage().cranes]}
 
     return jsonify(response)
 
@@ -19,7 +17,7 @@ def get_crane(crane_id: int):
     if is_crane_id_invalid(crane_id):
         return jsonify({"error": "crane_id is invalid"}), 400
 
-    crane = cranes[crane_id - 1]
+    crane = Storage().cranes[crane_id - 1]
 
     return jsonify(crane)
 
@@ -42,7 +40,7 @@ def set_cranes(crane_id: int):
     except:
         return jsonify({"error": "nb_tokens is invalid"}), 400
 
-    crane = cranes[crane_id - 1]
+    crane = Storage().cranes[crane_id - 1]
     crane.nb_tokens = nb_tokens
 
     return jsonify(crane)

@@ -1,15 +1,13 @@
 from flask import Blueprint, request, jsonify
 from constants import NB_VEHICLES, VEHICULE_ID_OFFSET
-from models import Vehicle
+from storage import Storage
 
 vehicles_bp = Blueprint("vehicles", __name__, url_prefix="/vehicles")
-
-vehicles: list[Vehicle] = [Vehicle(x + VEHICULE_ID_OFFSET, []) for x in range(NB_VEHICLES)]
 
 
 @vehicles_bp.route("/")
 def get_vehicles():
-    response = {"vehicles": [vehicle for vehicle in vehicles]}
+    response = {"vehicles": [vehicle for vehicle in Storage().vehicles]}
 
     return jsonify(response)
 
@@ -19,7 +17,7 @@ def get_vehicle(vehicle_id: int):
     if is_vehicle_id_invalid(vehicle_id):
         return jsonify({"error": "vehicle_id is invalid"}), 400
 
-    vehicle = vehicles[vehicle_id - VEHICULE_ID_OFFSET]
+    vehicle = Storage().vehicles[vehicle_id - VEHICULE_ID_OFFSET]
 
     return jsonify(vehicle)
 
@@ -44,11 +42,13 @@ def set_vehicle(vehicle_id: int):
     except:
         return jsonify({"error": "path must be a list of string"}), 400
 
-    vehicle = vehicles[vehicle_id - VEHICULE_ID_OFFSET]
+    vehicle = Storage().vehicles[vehicle_id - VEHICULE_ID_OFFSET]
     vehicle.path = path
 
     return jsonify(vehicle)
 
 
 def is_vehicle_id_invalid(team_id: int):
-    return team_id < VEHICULE_ID_OFFSET or team_id > NB_VEHICLES + VEHICULE_ID_OFFSET - 1
+    return (
+        team_id < VEHICULE_ID_OFFSET or team_id > NB_VEHICLES + VEHICULE_ID_OFFSET - 1
+    )
