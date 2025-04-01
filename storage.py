@@ -1,4 +1,4 @@
-from constants import NB_VEHICLES, VEHICULE_ID_OFFSET, NB_CRANES
+from constants import LOADING_ZONE_COUNT, NB_VEHICLES, VEHICULE_ID_OFFSET, NB_CRANES
 from models import Score, Scoreboard, Vehicle, Crane
 
 
@@ -21,4 +21,4 @@ class Storage:
             ],
             crane_scores=[Score(id=i + 1, points=0) for i in range(NB_CRANES)],
         )
-        self.cranes: list[Crane] = [Crane(x + 1, 0) for x in range(NB_CRANES)]
+        self.cranes: list[Crane] = [Crane(x + 1, 0) for x in range(LOADING_ZONE_COUNT)]

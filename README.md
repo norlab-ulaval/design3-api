@@ -55,7 +55,7 @@ Page pour valider que l'API est bien démarrée
 
 ### GET `/cranes`
 
-Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond au numéro d'une équipe et correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
+Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
 
 - Response:
   - **200** OK
