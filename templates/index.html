@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Design 3 API</title>
+    <style>
+      .container {
+        display: flex;
+      }
+      .column {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to the Design 3 API</h1>
+
+    <form id="reset-form">
+      <input
+        type="password"
+        id="password"
+        placeholder="Enter password"
+        required
+      />
+      <button type="submit">Reset API</button>
+    </form>
+
+    <div class="container">
+      <div class="column">
+        <h2>Vehicles</h2>
+        <ul id="vehicle-list">
+          {% for vehicle in vehicles %}
+          <li>Vehicle {{ vehicle.id }} - Path: {{ vehicle.path }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="column">
+        <h2>Cranes</h2>
+        <ul id="crane-list">
+          {% for crane in cranes %}
+          <li>ZC{{ crane.id }} - Tokens: {{ crane.nb_tokens }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("reset-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const password = document.getElementById("password").value;
+
+          fetch("/reset", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: password,
+            },
+          })
+            .then((response) => {
+              if (response.status === 401) {
+                throw new Error("Incorect password");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              alert(data.message);
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        });
+    </script>
+  </body>
+</html>

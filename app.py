@@ -1,9 +1,12 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 from storage import Storage
 from vehicles import vehicles_bp
 from cranes import cranes_bp
 from scores import scores_bp
 from dotenv import load_dotenv
+import os
+
+scoreboard_password = os.environ.get("SCOREBOARD_PASSWORD")
 
 
 def create_app():
@@ -16,20 +19,28 @@ def create_app():
 
     @app.route("/")
     def root():
-        if request.headers.get("Accept") == "application/json":
-            return jsonify({"message": "Welcome to the design 3 API."})
+        return render_template(
+            "index.html",
+            vehicles=Storage().vehicles,
+            cranes=filter(lambda c: c.nb_tokens > 0, Storage().cranes),
+        )
 
-        return "Welcome to the design 3 API."
-
-    @app.route("/reset")
+    @app.route("/reset", methods=["POST"])
     def reset():
+        if not is_authorized():
+            return jsonify({"error": "Unauthorized"}), 401
         Storage().reset()
-        if request.headers.get("Accept") == "application/json":
-            return jsonify({"message": "API reset was successful."})
-
-        return "API reset was successful."
+        return jsonify({"message": "API reset was successful."})
 
     return app
+
+
+def is_authorized():
+    if scoreboard_password is None:
+        return False
+
+    password = request.headers.get("Authorization")
+    return password == scoreboard_password
 
 
 if __name__ == "__main__":

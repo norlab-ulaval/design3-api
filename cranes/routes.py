@@ -7,7 +7,7 @@ cranes_bp = Blueprint("cranes", __name__, url_prefix="/cranes")
 
 @cranes_bp.route("/")
 def get_cranes():
-    response = {"cranes": [crane for crane in Storage().cranes]}
+    response = {"cranes": [crane for crane in Storage().cranes if crane.nb_tokens > 0]}
 
     return jsonify(response)
 
