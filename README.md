@@ -45,17 +45,10 @@ Pour votre utilisation de l'API, vous pouvez vous inspirer des scripts dans le r
 
 Page pour valider que l'API est bien démarrée
 
-- Response:
-  - **200** OK
-    ```json
-    {
-      "message": "Welcome to the design 3 API."
-    }
-    ```
 
 ### GET `/cranes`
 
-Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
+Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance. Retourne seulement les zones qui ont actuellement des tokens (nb_tokens > 0).
 
 - Response:
   - **200** OK
