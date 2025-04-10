@@ -69,7 +69,7 @@ Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id
 
 ### GET `/cranes/:id`
 
-Route pour obtenir l'information sur une équipe du sous-système grue spécifique.
+Route pour obtenir l'information sur une grue spécifique. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>).
 
 - Response:
 
@@ -91,7 +91,7 @@ Route pour obtenir l'information sur une équipe du sous-système grue spécifiq
 
 ### POST `/cranes/:id`
 
-Route utilisé pour mettre à jour le nombre de marchandise sur la balance pour les équipes du sous-système grue.
+Route utilisé pour mettre à jour le nombre de marchandise sur la balance pour les équipes du sous-système grue. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>).
 
 - Body:
 
@@ -108,7 +108,7 @@ Route utilisé pour mettre à jour le nombre de marchandise sur la balance pour 
 
 ### GET `/vehicles`
 
-Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le champ `id` correspond au numéro d'une équipe et correspond à l'id de la zone de dépôt (i.e. ZD\<id\>). Le champ `path` correspond au chemin actuel suivi par le véhicule.
+Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le champ `id` correspond à l'id de la zone de dépôt (i.e. ZD\<id\>) associé au véhicule. Le champ `path` correspond au chemin actuel suivi par le véhicule.
 
 - Response:
   - **200** OK
@@ -129,7 +129,7 @@ Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le cham
 
 ### GET `/vehicles/:id`
 
-Route pour obtenir l'information sur une équipe du sous-système véhicule spécifique.
+Route pour obtenir l'information sur une équipe du sous-système véhicule spécifique. Le champ `id` correspond à l'id de la zone de dépôt (i.e. ZD\<id\>).
 
 - Response:
 
