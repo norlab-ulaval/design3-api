@@ -45,10 +45,9 @@ Pour votre utilisation de l'API, vous pouvez vous inspirer des scripts dans le r
 
 Page pour valider que l'API est bien démarrée
 
-
 ### GET `/cranes`
 
-Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance. Retourne seulement les zones qui ont actuellement des tokens (nb_tokens > 0).
+Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
 
 - Response:
   - **200** OK
@@ -69,7 +68,7 @@ Route pour obtenir l'information sur tous les sous-systèmes grues. Le champ `id
 
 ### GET `/cranes/:id`
 
-Route pour obtenir l'information sur une grue spécifique. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>).
+Route pour obtenir l'information sur une grue spécifique. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
 
 - Response:
 
@@ -91,7 +90,7 @@ Route pour obtenir l'information sur une grue spécifique. Le champ `id` corresp
 
 ### POST `/cranes/:id`
 
-Route utilisé pour mettre à jour le nombre de marchandise sur la balance pour les équipes du sous-système grue. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>).
+Route utilisée pour mettre à jour le nombre de marchandise sur la balance pour les équipes du sous-système grue. Le champ `id` correspond à l'id de la zone de chargement (i.e. ZC\<id\>). Le champ `nb_tokens` correspond au nombre de marchandise actuellement sur la balance.
 
 - Body:
 
@@ -129,7 +128,7 @@ Route pour obtenir l'information sur tous les sous-systèmes véhicules. Le cham
 
 ### GET `/vehicles/:id`
 
-Route pour obtenir l'information sur une équipe du sous-système véhicule spécifique. Le champ `id` correspond à l'id de la zone de dépôt (i.e. ZD\<id\>).
+Route pour obtenir l'information sur une équipe du sous-système véhicule spécifique. Le champ `id` correspond à l'id de la zone de dépôt (i.e. ZD\<id\>). Le champ `path` correspond au chemin actuel suivi par le véhicule.
 
 - Response:
 
