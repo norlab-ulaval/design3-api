@@ -2,8 +2,8 @@ from time import sleep
 import requests
 import numpy as np
 
-TEAM_ID = 1
-URL = f"http://localhost:5000/cranes/{TEAM_ID}"
+UNLOADING_ZONE_ID = 1  # ZC1
+URL = f"http://localhost:5000/cranes/{UNLOADING_ZONE_ID}"
 
 if __name__ == "__main__":
     # 1 Hz refresh loop

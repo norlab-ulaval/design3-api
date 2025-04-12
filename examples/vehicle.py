@@ -1,7 +1,7 @@
 from time import sleep
 import requests
 
-TEAM_ID = 7
+LOADING_ZONE_ID = 7  # ZD7
 BASE_PATH = f"http://localhost:5000"
 
 if __name__ == "__main__":
@@ -21,6 +21,6 @@ if __name__ == "__main__":
         path = ["ZD7", "A1", "ZC1"]
 
         # Notify the server of the path
-        requests.post(f"{BASE_PATH}/vehicles/{TEAM_ID}", json={"path": path})
+        requests.post(f"{BASE_PATH}/vehicles/{LOADING_ZONE_ID}", json={"path": path})
 
         sleep(1)
