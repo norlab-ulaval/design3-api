@@ -32,6 +32,17 @@ def create_app():
         Storage().reset()
         return jsonify({"message": "API reset was successful."})
 
+    @app.route("/input_scores")
+    def input_scores():
+        return render_template("input_scores.html")
+
+    @app.route("/is_authorized")
+    def is_authorized_route():
+        if is_authorized():
+            return jsonify({"status": "Ok"}), 200
+        else:
+            return jsonify({"status": "Unauthorized"}), 401
+
     return app
 
 
