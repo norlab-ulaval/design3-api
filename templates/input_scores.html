@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Design3 API</title>
+    </head>
+    <body>
+        <p>
+            Pour utiliser la page de mise à jour des scores il vous faut premièrement entrer le mot de passe. Celui-ci sera sauvegardé. Par
+            la suite, il suffit d'utiliser les boutons + et - pour incrémenter et décrémenter le score des équipes.
+        </p>
+        <div id="password-container">
+            <h2>Mot de passe</h2>
+            <div>
+                <label for="password">Mot de passe: </label>
+                <input id="password" type="password" />
+                <button onclick="passwordSubmitted()">Soummettre</button>
+            </div>
+        </div>
+        <div id="scores">
+            <h2>Scores grues</h2>
+            <div>
+                <label>Équipe 01: </label>
+                <span id="score-grue-1">0</span>
+                <button class="add" onclick="incrementTeamScore(1)">+</button>
+                <button class="sub" onclick="decrementTeamScore(1)">-</button>
+            </div>
+            <div>
+                <label>Équipe 02: </label>
+                <span id="score-grue-2">0</span>
+                <button class="add" onclick="incrementTeamScore(2)">+</button>
+                <button class="sub" onclick="decrementTeamScore(2)">-</button>
+            </div>
+            <div>
+                <label>Équipe 03: </label>
+                <span id="score-grue-3">0</span>
+                <button class="add" onclick="incrementTeamScore(3)">+</button>
+                <button class="sub" onclick="decrementTeamScore(3)">-</button>
+            </div>
+            <div>
+                <label>Équipe 04: </label>
+                <span id="score-grue-4">0</span>
+                <button class="add" onclick="incrementTeamScore(4)">+</button>
+                <button class="sub" onclick="decrementTeamScore(4)">-</button>
+            </div>
+            <div>
+                <label>Équipe 05: </label>
+                <span id="score-grue-5">0</span>
+                <button class="add" onclick="incrementTeamScore(5)">+</button>
+                <button class="sub" onclick="decrementTeamScore(5)">-</button>
+            </div>
+            <div>
+                <label>Équipe 06: </label>
+                <span id="score-grue-6">0</span>
+                <button class="add" onclick="incrementTeamScore(6)">+</button>
+                <button class="sub" onclick="decrementTeamScore(6)">-</button>
+            </div>
+
+            <h2>Scores véhicules</h2>
+            <div>
+                <label>Équipe 07: </label>
+                <span id="score-vehicle-7">0</span>
+                <button class="add" onclick="incrementTeamScore(7)">+</button>
+                <button class="sub" onclick="decrementTeamScore(7)">-</button>
+            </div>
+            <div>
+                <label>Équipe 08: </label>
+                <span id="score-vehicle-8">0</span>
+                <button class="add" onclick="incrementTeamScore(8)">+</button>
+                <button class="sub" onclick="decrementTeamScore(8)">-</button>
+            </div>
+            <div>
+                <label>Équipe 09: </label>
+                <span id="score-vehicle-9">0</span>
+                <button class="add" onclick="incrementTeamScore(9)">+</button>
+                <button class="sub" onclick="decrementTeamScore(9)">-</button>
+            </div>
+            <div>
+                <label>Équipe 10: </label>
+                <span id="score-vehicle-10">0</span>
+                <button class="add" onclick="incrementTeamScore(10)">+</button>
+                <button class="sub" onclick="decrementTeamScore(10)">-</button>
+            </div>
+            <div>
+                <label>Équipe 11: </label>
+                <span id="score-vehicle-11">0</span>
+                <button class="add" onclick="incrementTeamScore(11)">+</button>
+                <button class="sub" onclick="decrementTeamScore(11)">-</button>
+            </div>
+            <div>
+                <label>Équipe 12: </label>
+                <span id="score-vehicle-12">0</span>
+                <button class="add" onclick="incrementTeamScore(12)">+</button>
+                <button class="sub" onclick="decrementTeamScore(12)">-</button>
+            </div>
+            <div>
+                <label>Équipe 13: </label>
+                <span id="score-vehicle-13">0</span>
+                <button class="add" onclick="incrementTeamScore(13)">+</button>
+                <button class="sub" onclick="decrementTeamScore(13)">-</button>
+            </div>
+            <div>
+                <label>Équipe 14: </label>
+                <span id="score-vehicle-14">0</span>
+                <button class="add" onclick="incrementTeamScore(14)">+</button>
+                <button class="sub" onclick="decrementTeamScore(14)">-</button>
+            </div>
+        </div>
+    </body>
+    <style>
+        p {
+            width: 30%;
+            text-align: justify;
+        }
+        .add {
+            margin: 3px;
+            padding: 5px, 0px;
+            font-weight: bold;
+            font-size: large;
+            background-color: green;
+        }
+        .sub {
+            background-color: red;
+            margin: 3px;
+            padding: 5px, 0px;
+            font-weight: bold;
+            font-size: large;
+        }
+        span {
+            margin: 20px;
+        }
+        div {
+            margin: 20px;
+        }
+
+        input {
+            padding: 5px;
+        }
+    </style>
+    <script>
+        function hide_scores_if_not_authorized() {
+            isAuthorized().then((authorized) => {
+                if (!authorized) {
+                    document.getElementById("scores").style.display = "none";
+                    document.getElementById("password-container").style.display = "block";
+                } else {
+                    document.getElementById("scores").style.display = "block";
+                    document.getElementById("password-container").style.display = "none";
+                    getScores();
+                }
+            });
+        }
+        window.onload = hide_scores_if_not_authorized;
+
+        async function passwordSubmitted() {
+            const password = document.getElementById("password").value;
+            localStorage.setItem("password", password);
+            const authorized = await isAuthorized();
+            if (authorized) {
+                getScores();
+                document.getElementById("scores").style.display = "block";
+                alert("Password set successfully!");
+            } else {
+                alert("Wrong password");
+            }
+            hide_scores_if_not_authorized();
+        }
+
+        function isAuthorized() {
+            const password = localStorage.getItem("password");
+            return fetch("/is_authorized", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: password,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data["status"] === "Ok") {
+                        console.log("Authorized");
+                        return true;
+                    } else {
+                        console.log("Unauthorized");
+                        return false;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error during authorization check:", error);
+                    return false;
+                });
+        }
+
+        function getScores() {
+            password = localStorage.getItem("password");
+            fetch("/scores", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: password,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    data["crane_scores"].forEach((crane) => {
+                        document.getElementById("score-grue-" + crane.id).innerText = crane.points;
+                    });
+                    data["vehicle_scores"].forEach((vehicle) => {
+                        document.getElementById("score-vehicle-" + vehicle.id).innerText = vehicle.points;
+                    });
+                })
+                .catch((error) => {
+                    return;
+                });
+        }
+
+        function decrementTeamScore(team_id) {
+            const password = localStorage.getItem("password");
+            fetch(`/scores/decrement/${team_id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: password,
+                },
+            }).then((response) => {
+                if (response.status === 400) {
+                    console.error("Cannot decrement score below 0");
+                }
+            });
+            getScores();
+        }
+
+        function incrementTeamScore(team_id) {
+            const password = localStorage.getItem("password");
+            fetch(`/scores/increment/${team_id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: password,
+                },
+            });
+
+            getScores();
+        }
+
+        setInterval(() => {
+            getScores();
+        }, 40);
+    </script>
+</html>

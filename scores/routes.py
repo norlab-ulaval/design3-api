@@ -15,29 +15,30 @@ def get_scores():
     return jsonify(Storage().scoreboard)
 
 
-@scores_bp.route("/", methods=["POST"])
-def set_scores():
-    if not request.is_json:
-        return jsonify({"error": "Content type is not json"}), 400
-
+@scores_bp.route("/increment/<int:team_id>", methods=["POST"])
+def increment_team_score(team_id: int):
     if not is_authorized():
         return jsonify({"error": "Unauthorized"}), 401
 
-    content = request.get_json()
-    try:
-        for vehicle_score in content["vehicle_scores"]:
-            vehicle_id = vehicle_score["id"]
-            points = vehicle_score["points"]
+    if team_id > 14 or team_id < 0:
+        return jsonify({"error": "team_id is invalid"}), 400
 
-            Storage().scoreboard.set_vehicle_score(vehicle_id, points)
+    Storage().scoreboard.increment_team_score(team_id)
 
-        for crane_score in content["crane_scores"]:
-            crane_id = crane_score["id"]
-            points = crane_score["points"]
+    return jsonify(Storage().scoreboard)
 
-            Storage().scoreboard.set_crane_score(crane_id, points)
-    except:
-        return jsonify({"error": "Invalid request"}), 400
+
+@scores_bp.route("/decrement/<int:team_id>", methods=["POST"])
+def decrement_team_score(team_id: int):
+    if not is_authorized():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if team_id > 14 or team_id < 0:
+        return jsonify({"error": "team_id is invalid"}), 400
+
+    if Storage().scoreboard.get_team_score(team_id) == 0:
+        return jsonify({"error": "team score is already 0"}), 400
+    Storage().scoreboard.decrement_team_score(team_id)
 
     return jsonify(Storage().scoreboard)
 
