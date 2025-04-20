@@ -4,6 +4,8 @@ from vehicles import vehicles_bp
 from cranes import cranes_bp
 from scores import scores_bp
 from dotenv import load_dotenv
+from flask_cors import CORS
+
 import os
 
 scoreboard_password = os.environ.get("SCOREBOARD_PASSWORD")
@@ -11,6 +13,7 @@ scoreboard_password = os.environ.get("SCOREBOARD_PASSWORD")
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     app.register_blueprint(vehicles_bp)
     app.register_blueprint(cranes_bp)
     app.register_blueprint(scores_bp)

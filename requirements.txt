@@ -3,3 +3,4 @@ waitress==3.0.2
 requests
 numpy
 python-dotenv
+flask-cors
