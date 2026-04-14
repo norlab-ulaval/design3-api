@@ -194,7 +194,7 @@
 
         function getScores() {
             password = localStorage.getItem("password");
-            fetch("/scores", {
+            fetch("/scores/", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
