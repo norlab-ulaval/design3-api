@@ -5,7 +5,7 @@
 # If vehicle_id is provided, gets info for that specific vehicle
 # If no vehicle_id is provided, gets info for all vehicles
 
-BASE_URL="http://designiii.ca"
+BASE_URL="https://designiii.ca"
 
 if [ -z "$1" ]; then
     # Get all vehicles

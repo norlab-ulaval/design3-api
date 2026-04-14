@@ -11,7 +11,7 @@ if [ -z "$1" ]; then
 fi
 
 VEHICLE_ID=$1
-BASE_URL="http://designiii.ca"
+BASE_URL="https://designiii.ca"
 
 # Example path: from ZD7 through A1 to ZC1
 # You can modify this path as needed

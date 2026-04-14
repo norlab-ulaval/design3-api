@@ -11,7 +11,7 @@ if [ -z "$1" ]; then
 fi
 
 CRANE_ID=$1
-BASE_URL="http://designiii.ca"
+BASE_URL="https://designiii.ca"
 
 # Number of tokens on the balance
 # You can modify this value as needed

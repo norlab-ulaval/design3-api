@@ -5,7 +5,7 @@
 # If crane_id is provided, gets info for that specific crane
 # If no crane_id is provided, gets info for all cranes
 
-BASE_URL="http://designiii.ca"
+BASE_URL="https://designiii.ca"
 
 if [ -z "$1" ]; then
     # Get all cranes
