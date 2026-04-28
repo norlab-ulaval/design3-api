@@ -16,6 +16,18 @@
         <h1 class="text-4xl font-bold text-blue-600">Design 3 API Overview</h1>
       </div>
 
+      <div class="bg-white rounded-xl shadow-md p-4 border-t-4 border-blue-500 mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Competition View</h2>
+        <div class="w-full">
+          <img
+            id="competition-frame"
+            src="/competition/"
+            alt="Competition view"
+            class="w-full h-auto rounded-lg"
+          />
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500">
           <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">Vehicles Information</h2>
@@ -27,7 +39,7 @@
                   <th class="py-3 px-6">Path</th>
                 </tr>
               </thead>
-              <tbody class="text-gray-600 text-sm font-light">
+              <tbody id="vehicles-table-body" class="text-gray-600 text-sm font-light">
                 {% for vehicle in vehicles %}
                 <tr class="border-b border-gray-200 hover:bg-gray-50">
                   <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-green-600">ZD{{ vehicle.id }}</td>
@@ -49,7 +61,7 @@
                   <th class="py-3 px-6">Tokens</th>
                 </tr>
               </thead>
-              <tbody class="text-gray-600 text-sm font-light">
+              <tbody id="cranes-table-body" class="text-gray-600 text-sm font-light">
                 {% for crane in cranes %}
                 <tr class="border-b border-gray-200 hover:bg-gray-50">
                   <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-purple-600">ZC{{ crane.id }}</td>
@@ -176,7 +188,65 @@
           });
       }
 
-      window.onload = checkAuth;
+      function refreshCompetitionFrame() {
+        const img = document.getElementById("competition-frame");
+        if (!img) return;
+        const cacheBuster = Date.now();
+        img.src = `/competition/?t=${cacheBuster}`;
+      }
+
+      async function refreshOverviewTables() {
+        try {
+          const [vehiclesRes, cranesRes] = await Promise.all([
+            fetch("/vehicles/"),
+            fetch("/cranes/"),
+          ]);
+
+          if (!vehiclesRes.ok || !cranesRes.ok) {
+            return;
+          }
+
+          const vehiclesData = await vehiclesRes.json();
+          const cranesData = await cranesRes.json();
+
+          const vehiclesBody = document.getElementById("vehicles-table-body");
+          const cranesBody = document.getElementById("cranes-table-body");
+
+          if (vehiclesBody && Array.isArray(vehiclesData.vehicles)) {
+            vehiclesBody.innerHTML = vehiclesData.vehicles.map((vehicle) => {
+              return `
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                  <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-green-600">ZD${vehicle.id}</td>
+                  <td class="py-3 px-6 text-left">${vehicle.path}</td>
+                </tr>
+              `;
+            }).join("");
+          }
+
+          if (cranesBody && Array.isArray(cranesData.cranes)) {
+            cranesBody.innerHTML = cranesData.cranes.map((crane) => {
+              return `
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                  <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-purple-600">ZC${crane.id}</td>
+                  <td class="py-3 px-6 text-left">${crane.nb_tokens}</td>
+                </tr>
+              `;
+            }).join("");
+          }
+        } catch (e) {
+          return;
+        }
+      }
+
+      window.onload = () => {
+        checkAuth();
+        refreshCompetitionFrame();
+        refreshOverviewTables();
+        setInterval(() => {
+          refreshCompetitionFrame();
+          refreshOverviewTables();
+        }, 3500);
+      };
     </script>
   </body>
 </html>

@@ -4,3 +4,5 @@ requests
 numpy
 python-dotenv
 flask-cors
+matplotlib
+Pillow

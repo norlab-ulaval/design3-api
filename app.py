@@ -3,6 +3,7 @@ from storage import Storage
 from vehicles import vehicles_bp
 from cranes import cranes_bp
 from scores import scores_bp
+from competition import competition_bp
 from dotenv import load_dotenv
 from flask_cors import CORS
 
@@ -17,6 +18,7 @@ def create_app():
     app.register_blueprint(vehicles_bp)
     app.register_blueprint(cranes_bp)
     app.register_blueprint(scores_bp)
+    app.register_blueprint(competition_bp)
 
     load_dotenv()
 

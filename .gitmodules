@@ -1,0 +1,3 @@
+[submodule "design3-competition-interface"]
+	path = design3-competition-interface
+	url = git@github.com:norlab-ulaval/design3-competition-interface.git
