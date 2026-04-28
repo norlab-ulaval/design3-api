@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from constants import NB_CRANES, NB_VEHICLES, VEHICULE_ID_OFFSET
 
 @dataclass
 class Crane:
@@ -25,22 +25,22 @@ class Scoreboard:
     crane_scores: list[Score]
 
     def get_team_score(self, team_id: int) -> int:
-        if team_id < 7:
+        if team_id < VEHICULE_ID_OFFSET:
             return self.crane_scores[team_id - 1].points
         else:
-            return self.vehicle_scores[team_id - 7].points
+            return self.vehicle_scores[team_id - VEHICULE_ID_OFFSET].points
 
     def increment_team_score(self, team_id: int):
-        if team_id < 7:
+        if team_id < VEHICULE_ID_OFFSET:
             self.crane_scores[team_id - 1].points += 1
         else:
-            self.vehicle_scores[team_id - 7].points += 1
+            self.vehicle_scores[team_id - VEHICULE_ID_OFFSET].points += 1
 
     def decrement_team_score(self, team_id: int):
-        if team_id < 7:
+        if team_id < VEHICULE_ID_OFFSET:
             self.crane_scores[team_id - 1].points -= 1
         else:
-            self.vehicle_scores[team_id - 7].points -= 1
+            self.vehicle_scores[team_id - VEHICULE_ID_OFFSET].points -= 1
 
     def set_vehicle_score(self, vehicle_id: int, points: int):
         for vehicle_score in self.vehicle_scores:

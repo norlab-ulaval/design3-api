@@ -37,7 +37,12 @@ def create_app():
 
     @app.route("/input_scores")
     def input_scores():
-        return render_template("input_scores.html")
+        storage = Storage()
+        return render_template(
+            "input_scores.html",
+            cranes=[score.id for score in storage.scoreboard.crane_scores],
+            vehicles=[score.id for score in storage.scoreboard.vehicle_scores],
+        )
 
     @app.route("/is_authorized")
     def is_authorized_route():
