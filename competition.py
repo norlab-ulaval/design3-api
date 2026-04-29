@@ -6,18 +6,17 @@ import time
 from pathlib import Path
 
 import matplotlib
-from flask import Blueprint, Response, jsonify, render_template
+from flask import Blueprint, Response, jsonify, render_template, request
 
 matplotlib.use("Agg")
 
 competition_bp = Blueprint("competition", __name__, url_prefix="/competition")
 
+scoreboard_password = os.environ.get("SCOREBOARD_PASSWORD")
+
 _interface_instance = None
 _cached_png = None
-_cached_at = 0.0
-_cache_lock = threading.Lock()
-
-scoreboard_password = os.environ.get("SCOREBOARD_PASSWORD")
+_is_viz_locked = False
 
 interface_dir = Path(__file__).resolve().parent / "design3-competition-interface"
 if str(interface_dir) not in sys.path:
@@ -37,10 +36,32 @@ def _get_interface_instance():
 def competition_view():
     return render_template("competition.html")
 
+@competition_bp.route("/lock_viz", methods=["GET"])
+def lock_viz():
+    if not is_authorized():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    global _is_viz_locked
+    _is_viz_locked = True
+
+    return jsonify({"status": "locked"})
+
+@competition_bp.route("/unlock_viz", methods=["GET"])
+def unlock_viz():
+    if not is_authorized():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    global _is_viz_locked
+    _is_viz_locked = False
+
+    return jsonify({"status": "unlocked"})
 
 @competition_bp.route("/image", methods=["GET"])
 def get_competition_frame():
     global _cached_png, _cached_at
+
+    if _is_viz_locked:
+        return _cached_png
 
     # If we have the image in cached
     now = time.monotonic()
@@ -67,3 +88,10 @@ def get_competition_frame():
     _cached_at = time.monotonic()
 
     return Response(_cached_png, mimetype="image/png")
+
+def is_authorized():
+    if scoreboard_password is None:
+        return False
+
+    password = request.headers.get("Authorization")
+    return password == scoreboard_password
