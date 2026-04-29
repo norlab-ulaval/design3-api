@@ -61,7 +61,6 @@
     <script>
         const CRANES = {{ cranes | tojson }};
         const VEHICLES = {{ vehicles | tojson }};
-        let eventSource = null;
 
         function createScoreRow(id, labelPrefix) {
             return `
@@ -80,58 +79,68 @@
             `;
         }
 
-        function initUI() {
-            const cranesList = document.getElementById("cranes-list");
-            const vehiclesList = document.getElementById("vehicles-list");
-            
-            CRANES.forEach(id => {
-                cranesList.innerHTML += createScoreRow(id, "Équipe");
-            });
-            
-            VEHICLES.forEach(id => {
-                vehiclesList.innerHTML += createScoreRow(id, "Équipe");
-            });
-        }
-
         async function hide_scores_if_not_authorized() {
             const authorized = await isAuthorized();
             if (!authorized) {
                 document.getElementById("scores-container").classList.add("hidden");
                 document.getElementById("password-container").classList.remove("hidden");
-                if (eventSource) {
-                    eventSource.close();
-                }
             } else {
                 document.getElementById("scores-container").classList.remove("hidden");
                 document.getElementById("password-container").classList.add("hidden");
-                startSSE();
+
+                const cranesList = document.getElementById("cranes-list");
+                const vehiclesList = document.getElementById("vehicles-list");
+                
+                CRANES.forEach(id => {
+                    cranesList.innerHTML += createScoreRow(id, "Équipe");
+                });
+
+                VEHICLES.forEach(id => {
+                    vehiclesList.innerHTML += createScoreRow(id, "Équipe");
+                });
+
+                getScores();
             }
         }
+        window.onload = hide_scores_if_not_authorized;
 
         async function passwordSubmitted() {
             const password = document.getElementById("password").value;
             localStorage.setItem("password", password);
             const authorized = await isAuthorized();
             if (authorized) {
+                getScores();
                 document.getElementById("scores-container").classList.remove("hidden");
-                document.getElementById("password-container").classList.add("hidden");
-                startSSE();
+                alert("Password set successfully!");
             } else {
                 alert("Wrong password");
             }
+            hide_scores_if_not_authorized();
         }
 
         function isAuthorized() {
             const password = localStorage.getItem("password");
-            if (!password) return Promise.resolve(false);
-            
             return fetch("/is_authorized", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": password,
+                    Authorization: password,
                 },
-            }).then(res => res.status === 200).catch(() => false);
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data["status"] === "Ok") {
+                        console.log("Authorized");
+                        return true;
+                    } else {
+                        console.log("Unauthorized");
+                        return false;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error during authorization check:", error);
+                    return false;
+                });
         }
 
         function updateScoreAnimate(element, newScore) {
@@ -146,28 +155,33 @@
             action();
         }
 
-        function startSSE() {
-            if (eventSource) {
-                eventSource.close();
-            }
-            const password = localStorage.getItem("password");
-            eventSource = new EventSource(`/scores/stream?password=${encodeURIComponent(password)}`);
-            
-            eventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                data.crane_scores.forEach(crane => {
-                    const el = document.getElementById("score-" + crane.id);
-                    if (el) updateScoreAnimate(el, crane.points);
+        function getScores() {
+            password = localStorage.getItem("password");
+            fetch("/scores/", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: password,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    data["crane_scores"].forEach((crane) => {
+                        const craneScore = document.getElementById("score-" + crane.id);
+                        if (craneScore) {
+                            craneScore.innerText = crane.points;
+                        }
+                    });
+                    data["vehicle_scores"].forEach((vehicle) => {
+                        const vehicleScore = document.getElementById("score-" + vehicle.id);
+                        if (vehicleScore) {
+                            vehicleScore.innerText = vehicle.points;
+                        }
+                    });
+                })
+                .catch((error) => {
+                    return;
                 });
-                data.vehicle_scores.forEach(vehicle => {
-                    const el = document.getElementById("score-" + vehicle.id);
-                    if (el) updateScoreAnimate(el, vehicle.points);
-                });
-            };
-
-            eventSource.onerror = function() {
-                console.error("SSE connection lost or error. Reconnecting...");
-            };
         }
 
         function decrementTeamScore(team_id) {
@@ -176,9 +190,14 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": password,
+                    Authorization: password,
                 },
-            }).catch(console.error);
+            }).then((response) => {
+                if (response.status === 400) {
+                    console.error("Cannot decrement score below 0");
+                }
+            });
+            getScores();
         }
 
         function incrementTeamScore(team_id) {
@@ -187,15 +206,16 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": password,
+                    Authorization: password,
                 },
-            }).catch(console.error);
+            });
+
+            getScores();
         }
 
-        window.onload = () => {
-            initUI();
-            hide_scores_if_not_authorized();
-        };
+        setInterval(() => {
+            getScores();
+        }, 500);
     </script>
 </body>
 </html>
