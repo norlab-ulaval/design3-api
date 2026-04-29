@@ -42,25 +42,28 @@ def competition_view():
 def get_competition_frame():
     global _cached_png, _cached_at
 
+    # If we have the image in cached
     now = time.monotonic()
     if _cached_png is not None and (now - _cached_at) <= 3.0:
         return Response(_cached_png, mimetype="image/png")
 
-    with _cache_lock:
-        now = time.monotonic()
-        if _cached_png is not None and (now - _cached_at) <= 3.0:
-            return Response(_cached_png, mimetype="image/png")
+    # If not, we regenerate it and cache it back
+    try:
+        interface = _get_interface_instance()
+        fig = interface.draw()
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
 
-        try:
-            interface = _get_interface_instance()
-            fig = interface.draw()
-        except Exception as exc:
-            return jsonify({"error": str(exc)}), 500
+    buffer = io.BytesIO()
 
-        buffer = io.BytesIO()
+    try:
         fig.savefig(buffer, format="png", dpi=150, bbox_inches="tight", pad_inches=0)
-        buffer.seek(0)
-        _cached_png = buffer.getvalue()
-        _cached_at = time.monotonic()
+    finally:
+        import matplotlib.pyplot as plt
+        plt.close(fig)
+
+    buffer.seek(0)
+    _cached_png = buffer.getvalue()
+    _cached_at = time.monotonic()
 
     return Response(_cached_png, mimetype="image/png")
