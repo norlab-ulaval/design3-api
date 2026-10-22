@@ -36,8 +36,8 @@ Le répertoire [./tests](./tests/) contient aussi des scripts `curl` pour essaye
 ```sh
 ./examples/bash/post_crane.bash 1 3     # la grue ZC1 publie 3 jetons
 ./examples/bash/post_vehicle.bash 7     # le véhicule ZD7 publie le chemin ["ZD7", "A1", "ZC1"]
-./examples/bash/get_cranes.bash         # toutes les grues (ou ./tests/get_cranes.bash 1 pour une seule)
-./examples/bash/get_vehicles.bash       # tous les véhicules (ou ./tests/get_vehicles.bash 7)
+./examples/bash/get_cranes.bash         # toutes les grues (ou ./examples/bash/get_cranes.bash 1 pour une seule)
+./examples/bash/get_vehicles.bash       # tous les véhicules (ou ./examples/bash/get_vehicles.bash 7)
 ```
 
 ## Cycle de vie d'une équipe
