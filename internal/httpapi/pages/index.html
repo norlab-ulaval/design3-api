@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API Design 3</title>
+<style>
+[hidden] { display: none !important; }
+body { font-family: system-ui, sans-serif; margin: 0 auto; padding: 16px; max-width: 720px; color: #222; background: #fff; }
+h1 { font-size: 1.4rem; } h2 { font-size: 1.1rem; margin-top: 1.5rem; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+th { background: #f0f0f0; }
+button { min-height: 48px; padding: 0 16px; font-size: 1rem; touch-action: manipulation; }
+input { min-height: 44px; font-size: 1rem; padding: 0 8px; box-sizing: border-box; }
+#admin > * { margin: 8px 8px 8px 0; display: inline-block; }
+#msg { color: #b00020; display: block; min-height: 1.2em; }
+a.btn { padding: 12px 0; }
+</style>
+</head>
+<body>
+<h1>API Design 3</h1>
+<h2>Véhicules</h2>
+<table>
+<tr><th>Zone</th><th>Chemin</th></tr>
+{{range .Vehicles}}<tr><td>ZD{{.ID}}</td><td>{{.Path}}</td></tr>
+{{end}}</table>
+<h2>Grues</h2>
+<table>
+<tr><th>Zone</th><th>Jetons</th></tr>
+{{range .Cranes}}<tr><td>ZC{{.ID}}</td><td>{{.NbTokens}}</td></tr>
+{{end}}</table>
+<h2>Administration</h2>
+<div id="admin">
+<form id="login" hidden>
+<input id="pw" type="password" placeholder="Mot de passe" aria-label="Mot de passe" autocomplete="current-password">
+<button type="submit">Déverrouiller</button>
+</form>
+<div id="unlocked" hidden>
+<button id="reset" type="button">Réinitialiser l'API</button>
+<a class="btn" href="/input_scores">Saisie des points</a>
+<button id="logout" type="button">Verrouiller</button>
+</div>
+<span id="msg" role="alert"></span>
+</div>
+<script>
+(function () {
+  var login = document.getElementById('login'), unlocked = document.getElementById('unlocked');
+  var pw = document.getElementById('pw'), msg = document.getElementById('msg');
+  function show(ok) { login.hidden = ok; unlocked.hidden = !ok; msg.textContent = ''; }
+  function check() {
+    fetch('/admin/session').then(function (r) { show(r.status === 200); },
+      function () { show(false); });
+  }
+  login.addEventListener('submit', function (e) {
+    e.preventDefault();
+    msg.textContent = '';
+    fetch('/admin/login', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pw.value})}).then(function (r) {
+      pw.value = '';
+      if (r.status === 204) { show(true); }
+      else if (r.status === 401) { msg.textContent = 'Mot de passe incorrect'; }
+      else { msg.textContent = 'Erreur réseau'; }
+    }, function () { msg.textContent = 'Erreur réseau'; });
+  });
+  document.getElementById('logout').addEventListener('click', function () {
+    fetch('/admin/logout', {method: 'POST'}).then(function () { show(false); },
+      function () { msg.textContent = 'Erreur réseau'; });
+  });
+  document.getElementById('reset').addEventListener('click', function () {
+    if (!confirm("Réinitialiser l'API ? Toutes les grues, tous les véhicules et tous les points seront effacés.")) { return; }
+    fetch('/reset', {method: 'POST'}).then(function (r) {
+      if (r.status === 200) { location.reload(); }
+      else if (r.status === 401) { show(false); }
+      else { msg.textContent = 'Erreur réseau'; }
+    }, function () { msg.textContent = 'Erreur réseau'; });
+  });
+  check();
+})();
+</script>
+</body>
+</html>

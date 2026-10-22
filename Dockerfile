@@ -1,18 +1,12 @@
-FROM python:3.12-alpine AS dev
-
-EXPOSE 5000
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
-
+FROM golang:1.25 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/api . && mkdir -p /out/data
 
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
-
-
-FROM dev AS prod
-
-ENTRYPOINT ["waitress-serve", "--listen", "0.0.0.0:5000", "--call", "app:create_app"]
+FROM gcr.io/distroless/static-debian12:nonroot
+COPY --from=build /out/api /api
+COPY --from=build --chown=65532:65532 /out/data /data
+EXPOSE 5000
+ENTRYPOINT ["/api"]

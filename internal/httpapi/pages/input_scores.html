@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saisie des points</title>
+<style>
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { font-family: system-ui, sans-serif; margin: 0 auto; padding: 12px; max-width: 520px; color: #222; background: #fff; }
+h1 { font-size: 1.3rem; margin: 0 0 4px; }
+h2 { font-size: 1.1rem; margin: 18px 0 6px; }
+#status { font-size: 0.85rem; color: #555; margin-bottom: 8px; }
+#status.live { color: #1b7f3b; } #status.lost { color: #b00020; }
+.row { display: flex; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid #ddd; flex-wrap: wrap; }
+.name { flex: 1 1 0; min-width: 0; white-space: nowrap; }
+.score { width: 44px; text-align: right; font-size: 1.4rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+.row button { flex: 0 0 56px; width: 56px; height: 56px; padding: 0; font-size: 1.3rem; touch-action: manipulation; }
+.row button.flash { background: #bfe3c8; }
+.err { flex: 1 0 100%; color: #b00020; font-size: 0.9rem; }
+#login input, #login button { min-height: 56px; font-size: 1.1rem; touch-action: manipulation; }
+#login input { width: 100%; margin-bottom: 8px; padding: 0 8px; }
+#login button { width: 100%; }
+#msg { color: #b00020; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<h1>Saisie des points</h1>
+<form id="login" hidden>
+<input id="pw" type="password" placeholder="Mot de passe" aria-label="Mot de passe" autocomplete="current-password">
+<button type="submit">Déverrouiller</button>
+<div id="msg" role="alert"></div>
+</form>
+<div id="main" hidden>
+<div id="status" class="lost">reconnexion…</div>
+<h2>Grues</h2>
+<div id="cranes"></div>
+<h2>Véhicules</h2>
+<div id="vehicles"></div>
+</div>
+<script>
+(function () {
+  var login = document.getElementById('login'), main = document.getElementById('main');
+  var pw = document.getElementById('pw'), msg = document.getElementById('msg');
+  var status = document.getElementById('status');
+  var scoreEls = {}, es = null, timer = null;
+
+  function setStatus(live) {
+    status.textContent = live ? 'en direct' : 'reconnexion…';
+    status.className = live ? 'live' : 'lost';
+  }
+  function closeStream() {
+    if (timer) { clearTimeout(timer); timer = null; }
+    if (es) { es.close(); es = null; }
+  }
+  function showPrompt() {
+    closeStream();
+    main.hidden = true; login.hidden = false;
+    document.getElementById('cranes').textContent = '';
+    document.getElementById('vehicles').textContent = '';
+    scoreEls = {}; shownIds = null;
+    msg.textContent = '';
+  }
+  function showMain() {
+    login.hidden = true; main.hidden = false;
+    openStream();
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function rowError(row, text) {
+    var e = row.querySelector('.err');
+    if (!e) { e = document.createElement('div'); e.className = 'err'; row.appendChild(e); }
+    e.textContent = text;
+    clearTimeout(row._t);
+    row._t = setTimeout(function () { if (e.parentNode) { e.parentNode.removeChild(e); } }, 4000);
+  }
+  function click(row, btn, id, url) {
+    btn.classList.add('flash');
+    setTimeout(function () { btn.classList.remove('flash'); }, 150);
+    fetch(url, {method: 'POST'}).then(function (r) {
+      if (r.ok) { return; }
+      if (r.status === 401) { rowError(row, 'Session expirée'); showPrompt(); }
+      else if (r.status === 400) { rowError(row, 'Déjà à 0'); }
+      else { rowError(row, 'Erreur réseau'); }
+    }, function () { rowError(row, 'Erreur réseau'); });
+  }
+  function makeRow(parent, id) {
+    var row = document.createElement('div'); row.className = 'row';
+    var name = document.createElement('span'); name.className = 'name';
+    name.textContent = 'Équipe ' + pad(id);
+    var score = document.createElement('span'); score.className = 'score'; score.textContent = '0';
+    row.appendChild(name); row.appendChild(score);
+    [['−', '/scores/decrement/' + id], ['+', '/scores/increment/' + id],
+     ['+5', '/scores/increment/' + id + '?amount=5']].forEach(function (b) {
+      var btn = document.createElement('button'); btn.type = 'button'; btn.textContent = b[0];
+      btn.addEventListener('click', function () { click(row, btn, id, b[1]); });
+      row.appendChild(btn);
+    });
+    parent.appendChild(row);
+    scoreEls[id] = score;
+  }
+  var shownIds = null;
+  function render(data) {
+    var ids = (data.crane_scores || []).concat(data.vehicle_scores || []).map(function (t) { return t.id; }).join(',');
+    if (ids !== shownIds) {
+      shownIds = ids;
+      scoreEls = {};
+      document.getElementById('cranes').textContent = '';
+      document.getElementById('vehicles').textContent = '';
+      (data.crane_scores || []).forEach(function (t) { makeRow(document.getElementById('cranes'), t.id); });
+      (data.vehicle_scores || []).forEach(function (t) { makeRow(document.getElementById('vehicles'), t.id); });
+    }
+    (data.crane_scores || []).concat(data.vehicle_scores || []).forEach(function (t) {
+      if (scoreEls[t.id]) { scoreEls[t.id].textContent = t.points; }
+    });
+  }
+  function openStream() {
+    closeStream();
+    es = new EventSource('/scores/stream');
+    var mine = es;
+    es.onopen = function () { setStatus(true); };
+    es.onmessage = function (ev) {
+      setStatus(true);
+      try { render(JSON.parse(ev.data)); } catch (e) {}
+    };
+    es.onerror = function () {
+      setStatus(false);
+      fetch('/admin/session').then(function (r) { return r.status; }, function () { return 0; })
+        .then(function (code) {
+          if (es !== mine) { return; }
+          if (code === 401) { showPrompt(); }
+          else if (mine.readyState === EventSource.CLOSED && !timer) {
+            timer = setTimeout(function () { timer = null; if (es === mine) { openStream(); } }, 2000);
+          }
+        });
+    };
+  }
+
+  login.addEventListener('submit', function (e) {
+    e.preventDefault();
+    msg.textContent = '';
+    fetch('/admin/login', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pw.value})}).then(function (r) {
+      pw.value = '';
+      if (r.status === 204) { showMain(); }
+      else if (r.status === 401) { msg.textContent = 'Mot de passe incorrect'; }
+      else { msg.textContent = 'Erreur réseau'; }
+    }, function () { msg.textContent = 'Erreur réseau'; });
+  });
+  fetch('/admin/session').then(function (r) {
+    if (r.status === 200) { showMain(); } else { showPrompt(); }
+  }, function () { showPrompt(); });
+})();
+</script>
+</body>
+</html>
